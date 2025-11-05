@@ -1,0 +1,408 @@
+
+% =====================
+% 一、带着问题阅读
+% =====================
+\section{研究背景与理论框架}
+
+\begin{frame}{研究目标}
+    \begin{enumerate}
+        \item 路径识别：老年人健康恶化是随机过程还是存在可识别的主导路径？慢性病在其中是“催化剂”还是“必经站”？
+        \item 因果识别：慢性病与失能的高度相关是否为因果？示范区政策能否作为有效“因”降低失能风险这个“果”？
+        \item 机制探究：政策若有效，其作用“黑箱”为何？健康意识、就医行为还是疾病管理效果的改善？
+        \item 异质性：干预效果是否“一刀切”？在不同医疗资源与社会经济环境下是否存在显著差异？
+    \end{enumerate}
+\end{frame}
+
+% =====================
+% 二、理论框架与公式
+% =====================
+
+
+\begin{frame}{健康资本存量动态方程}
+    任一时期，个人的健康状况反映其健康资本存量，是由初始健康资本、后天健康投资，以及健康资本折旧（或损耗）共同决定的（Grossman，1972）\cite{Grossman1972}。
+    \begin{block}{健康资本模型}
+        $$
+            H_{t+1} = I_t + (1 - \delta_t) H_t
+        $$
+
+        \begin{itemize}
+            \item $H_t$：当前健康资本存量
+            \item $I_t$：当期健康投资（锻炼、营养、医疗、健康教育等）。
+            \item $\delta_t$：健康资本折旧率
+            \item $(1-\delta_t)H_t$：经历折旧后的存量部分。
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}{折旧率函数}
+    Fu 等（2016）\cite{Fu2016}的研究延拓了 Grossman 的研究框架，将健康环境、健康投资、年龄因素等引入折旧率函数的理论中：
+    $$
+        \delta_t = \delta(I_t, a_t) = \gamma_1 I_t^{\gamma_2} a_t^{\gamma_3}
+    $$
+
+    \begin{itemize}
+        \item $a_t$：年龄。假设年龄越大折旧越快且加速递增，即$\frac{\partial }{\partial a_t}\delta_t>0$，$\gamma_3>1$。
+        \item $I_t$：健康投资。假设投资可减缓折旧但边际递减，即$\frac{\partial }{\partial I_t}\delta_t<0$，$\gamma_2\in(-1,0)$。
+        \item $\gamma_1$：健康环境系数。当$\gamma_1>1$（如污染、不良习惯、\textbf{患慢性病}）折旧放大；$0<\gamma_1<1$（良好公共卫生）折旧缩小。
+    \end{itemize}
+
+    本文将“患慢性病”视作使$\gamma_1>1$的关键事件。患慢性病时，$\delta_t$跃升，由此$H_{t+1} = I_t + (1 - \delta_t) H_t$中$H_{t+1}$加速耗尽，更快跌破失能阈值$H_{\mathrm{dis}}$，说明“健康→慢性病→失能”的路径。
+
+    \begin{tcolorbox}
+        $t$ 是时间索引，而 $a_t$ 是该时点的生理年龄，一般满足 $a_t = a_0 + t$。例如2020年(t=0)某个60岁年龄个体的折旧率为$ \delta_0 = \gamma_1 I_0^{\gamma_2} 60^{\gamma_3} $。
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{健康资本存量、健康状态与年龄的关系示意图}
+    \begin{figure}
+        \includegraphics[width=0.4\textwidth]{096ab7dc0762223bc823218654e538e57e804fd0396834a3c3e3667bb3f91214.jpg}
+    \end{figure}
+
+    \begin{itemize}
+        \item $I$不变的条件下，随着$t$增长，$\delta$加速增长，从而$H$加速下跌，意味着健康状况恶化加速，失能风险上升。
+        \item $t$不变，I变大，$\delta$变小，$H$下降延迟。意味着早开展预防工作可以通过降低慢性病患病率，推迟并发症出现时间，延缓失能发生并减少失能人口规模
+    \end{itemize}
+
+\end{frame}
+% =====================
+% 三、数据与模型（规律探寻）
+% =====================
+\section{健康状态转移模型}
+
+\begin{frame}{死亡风险模型：Logit}
+
+    \begin{block}{数据结构}
+        \begin{itemize}
+            \item $Y\in\{0=\mathrm{H}(\text{健康}), 1=\mathrm{C}(\text{慢性病}), 2=\mathrm{I}(\text{失能}), 3=\mathrm{D}(\text{死亡})\}$。$X$为控制变量集
+            \item 本章节目标是得到$P(Y_{t}\mid Y_{t-1})$的估计，从而建立状态转移矩阵
+        \end{itemize}
+    \end{block}
+    假设健康状态转移在健康状态空间$S$与年龄集合$T$上服从\textbf{时间齐次离散Markov}过程，当期状态仅与上一期状态有关。记$\text{logit}(p)=\ln\tfrac{p}{1-p}$。
+    \[
+        \text{logit}\big[P(Y_{t}=3\mid Y_{t-1},X)\big]=\alpha+\beta Y_{t-1}+\gamma X \quad\text{（模型1）}
+    \]
+    $Y=3$死亡是吸收态，因此自变量只取$Y_{t-1}\in\{0,1,2\}$。
+
+    \begin{tcolorbox}
+        $Y_{t-1}$ 本质为两类示性变量的组，后文模型结果中实际的模型表述为：
+        \[
+            \text{logit}\big[P(Y_{t}=3\mid Y_{t-1},X)\big]=\alpha+\beta_1 I_{Y_{t-1}=1}+\beta_2 I_{Y_{t-1}=2}+\gamma X
+        \]
+    \end{tcolorbox}
+\end{frame}
+
+
+\begin{frame}{存活者健康状态转移模型：有序Logit}
+    假设模型满足平行性假设：无论因变量如何取值$j$，自变量的系数不变。
+
+    \[
+        \text{logit}\big[P(Y_{t}>j\mid Y_{t-1},X)\big]=\alpha+\beta Y_{t-1}+\gamma X \quad\text{（模型2）}
+    \]
+
+    \begin{tcolorbox}
+        \begin{itemize}
+            \item 有序Logit可理解为常数项不同，其它系数相同的多个方程。
+            \item 此处$Y\in\{0=\mathrm{H}(\text{健康}), 1=\mathrm{C}(\text{慢性病}), 2=\mathrm{I}(\text{失能}), 3=\mathrm{D}(\text{死亡})\}$是给定个体存活的条件下，因此上述模型中$Y\in \{0,1,2\},j\in\{0,1\}$。
+        \end{itemize}
+        \textbf{严谨的数学表述：}
+        \begin{align*}
+            \text{logit}\big[P(Y_{t}>0\mid Y_{t-1}\neq 3,X)\big] & = \alpha_0+\beta Y_{t-1}+\gamma X \\
+            \text{logit}\big[P(Y_{t}>1\mid Y_{t-1}\neq 3,X)\big] & = \alpha_1+\beta Y_{t-1}+\gamma X
+        \end{align*}
+
+        常数项$\alpha_0,\alpha_1$分别表示潜在连续变量$Y$中$Y=0 \rightarrow 1$，$Y=1 \rightarrow 2$所需的“理论潜在门槛”。
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{广义有序Logit}
+    有序Logit模型要求满足平行性假设，但现实中不满足，因为“健康 –> 慢性病”、“慢性病–>失能”的转移概率不同。
+
+    为此，本文又建立广义有序Logit模型，即对不同的划分$j$，系数不同：
+
+    \begin{equation*}
+        \text{logit}\big[P(Y_{t}>j\mid Y_{t-1},X)\big]=\alpha_{j}+\beta_{j}Y_{t-1}+\gamma X
+    \end{equation*}
+    这里因变量一共有两种划分$j=0 or j=1$，由此衍生出模型3（健康 vs 不健康）和模型4（“健康+慢性病vs失能”）
+    \begin{align*}
+        \text{logit}\big[P(Y_{t}>0\mid Y_{t-1},X)\big] & =\alpha+\beta Y_{t-1}+\gamma X \quad\text{（模型3："C+I" vs "H"）} \\
+        \text{logit}\big[P(Y_{t}>1\mid Y_{t-1},X)\big] & =\alpha+\beta Y_{t-1}+\gamma X \quad\text{（模型4："I" vs "H+C"）}
+    \end{align*}
+
+\end{frame}
+
+\begin{frame}{数据说明}
+    2018～2020 年CHARLS 数据，样本量8131人次，年龄60岁及以上老年人群体。
+    \begin{itemize}
+        \item $Y_{t}$：$t$ 时刻期末的存活健康状态$Y\in\{0=\mathrm{H}(\text{健康}), 1=\mathrm{C}(\text{慢性病}), 2=\mathrm{I}(\text{失能}), 3=\mathrm{D}(\text{死亡})\}$
+
+        \item $X$ 为控制变量集：
+              \begin{itemize}
+                  \item  \textbf{年龄}（连续变量）
+                  \item  \textbf{性别}（男$=1$，女$=0$）
+                  \item  \textbf{居住地}（农村$=1$，城镇$=0$）
+                  \item  \textbf{受教育程度}（分类变量）
+                  \item  \textbf{婚姻状况}（在婚$=1$，其他$=0$）
+              \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% =====================
+% 四、结果1（回归表）
+% =====================
+
+\begin{frame}{结果：参数估计}
+    \scriptsize
+    \centering
+    \begin{threeparttable}
+        \begin{tabular}{l*{4}{c}}
+            \toprule
+            变量           & 模型1 Logit             & 模型2 有序Logit            & 模型3 广义有序Logit         & 模型4  广义有序Logit        \\
+                         & $\mathbf{1}[Y_{t}=3]$ & $\mathbf{1}[Y_{t}> j]$ & $\mathbf{1}[Y_{t}>0]$ & $\mathbf{1}[Y_{t}>1]$ \\
+                         & $\sim Y_{t-1}+X$      & $\sim Y_{t-1}+X$       & $\sim Y_{t-1}+X$      & $\sim Y_{t-1}+X$      \\
+            \midrule
+            年龄           & 0.076***              & 0.057***               & 0.014**               & 0.067***              \\
+            性别           & 0.816***              & -0.173***              & -0.188***             & -0.188***             \\
+            居住地类型        & 0.011                 & -0.212***              & -0.234***             & -0.234***             \\
+            受教育程度        & -0.411*               & -0.153                 & -0.210*               & -0.210*               \\
+            婚姻状况         & -0.393***             & 0.023                  & 0.037                 & 0.037                 \\
+            慢性病          & -0.12                 & 3.169***               & 4.054***              & 0.575***              \\
+            失能           & 1.155***              & 4.614***               & 3.749***              & 2.205***              \\
+            常数项          & -8.928***             & —                      & -1.313***             & -6.626***             \\
+            \midrule
+            Pseudo-R$^2$ & 0.1463                & 0.1877                 & 0.2877                & 0.2877                \\
+            N            & 8131                  & 7620                   & 7620                  & 7620                  \\
+            \bottomrule
+        \end{tabular}
+        \begin{tablenotes}\tiny
+            \item 模型2有序 Logit 模型的切点值分别为 4.079、8.372，$^*$、$^{**}$、$^{***}$分别表示在10\%、5\%、1\%水平显著。
+        \end{tablenotes}
+    \end{threeparttable}
+    \begin{itemize}
+        \item 老年人健康状态变差的概率显著提高
+        \item 期初健康状态越差，期末健康恶化的概率越高。与女性、农村老人相比，男性、城市老人健康状态变差的概率较低
+        \item 初中及以上学历的老人期末健康状态显著更好。
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{结果：状态转移矩阵}
+
+
+    \tiny
+    \begin{columns}[t]
+        \column{0.5\textwidth}
+        $\mathbf{P}^{(60\text{--}64)}=\begin{bmatrix}
+                0.6457 & 0.3313 & 0.0071 & 0.0159 \\
+                0.0731 & 0.7664 & 0.1461 & 0.0143 \\
+                0.0167 & 0.5204 & 0.4151 & 0.0478 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$\\[0.8em]
+        $\mathbf{P}^{(65\text{--}69)}=\begin{bmatrix}
+                0.5723 & 0.3928 & 0.0094 & 0.0255 \\
+                0.0555 & 0.7393 & 0.1836 & 0.0216 \\
+                0.0124 & 0.4487 & 0.4708 & 0.0681 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$\\[0.8em]
+        $\mathbf{P}^{(70\text{--}74)}=\begin{bmatrix}
+                0.5016 & 0.4490 & 0.0120 & 0.0374 \\
+                0.0428 & 0.7010 & 0.2235 & 0.0327 \\
+                0.0093 & 0.3784 & 0.5155 & 0.0968 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$
+        \column{0.5\textwidth}
+        $\mathbf{P}^{(75\text{--}79)}=\begin{bmatrix}
+                0.4269 & 0.5012 & 0.0156 & 0.0563 \\
+                0.0329 & 0.6540 & 0.2675 & 0.0455 \\
+                0.0066 & 0.3006 & 0.5460 & 0.1467 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$\\[0.8em]
+        $\mathbf{P}^{(80\text{--}84)}=\begin{bmatrix}
+                0.3506 & 0.5481 & 0.0200 & 0.0813 \\
+                0.0246 & 0.5899 & 0.3133 & 0.0722 \\
+                0.0047 & 0.2348 & 0.5545 & 0.2060 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$\\[0.8em]
+        $\mathbf{P}^{(85+)}=\begin{bmatrix}
+                0.2434 & 0.5872 & 0.0302 & 0.1392 \\
+                0.0167 & 0.4970 & 0.3747 & 0.1116 \\
+                0.0028 & 0.1536 & 0.5273 & 0.3163 \\
+                0      & 0      & 0      & 1
+            \end{bmatrix}$
+    \end{columns}
+
+
+    \small
+    状态转移矩阵按$S=(\mathrm{H},\mathrm{C},\mathrm{I},\mathrm{D})$顺序给出。例如$P(H \rightarrow D \mid 60-64岁)=\mathbf{P}^{(60\text{--}64)}_{14}=0.0159$表示60–64岁健康老人转移到死亡状态的概率为1.59\%。
+
+    \begin{itemize}
+        \item 健康→慢性病概率随年龄显著上升；75岁后维持健康的概率降至50\%以下。
+        \item 失能并非突然发生，由慢性病及其并发引致的失能概率远高于“自然失能”。
+        \item 失能存在有限“可逆性”，但以恢复至慢性病状态为主；慢性病痊愈概率极低。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{结果：状态转移矩阵}
+    \begin{tcolorbox}
+        \begin{quote}
+            式（5）估计的健康状态转移概率以老年人期末存活为条件，构造健康状态转移矩阵时需将条件概率转换成无条件概率，从而估算完整的健康状态转移概率矩阵
+        \end{quote}
+        疑似使用模型2（有序Logit）来得到状态转移矩阵
+    \end{tcolorbox}
+\end{frame}
+
+% =====================
+% 六、双重差分（策略评估）
+% =====================
+\section{慢性病综合防控对失能水平的影响}
+
+\begin{frame}{DID模型}
+    通过比较“处理组在政策前后的变化”与“控制组在政策前后的变化”之差，来剔除共同时间趋势的干扰，从而分离出政策的纯粹影响。这是一种在公共政策评估中广泛使用的、非常可靠的因果推断方法。
+    \begin{equation*}
+        \mathrm{Disability}_{ict} = \alpha + \beta\, (\mathrm{Treat}_{ic}\times \mathrm{post}_{it}) + \gamma X_{ict} + \eta_t + \delta_i + \lambda_c + \varepsilon_{ict}
+    \end{equation*}
+
+    \begin{itemize}
+        \item $\mathrm{Disability}_{ict}$：失能水平得分。
+        \item $\mathrm{Treat}_{ic}$：示性变量：是否是处理组（示范区）
+        \item $\mathrm{post}_{it}$：示性变量：政策是否实施
+        \item $\beta$：\textbf{本章节的比较目标}，度量政策的净效应。
+        \item 固定效应：$\eta_t$时间、$\delta_i$个体、$\lambda_c$地区固定效应。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{数据说明}
+
+    数据来源：2011–2020年CHARLS调查（五期非平衡面板）,《中国城市统计年鉴》：地级市统计数据
+
+
+    \begin{itemize}
+        \item ${Disability}$，失能水平（1–4分），由穿衣、洗澡、吃饭、上下床、如厕、控制大小便等6项细项合成，分值越高表示失能程度越严重
+        \item $Treat×Post$，示范区和政策实施的交互效应，反映处理组与控制组在示范区设立前后失能水平变化的差异
+        \item $X$：个体层面（年龄、性别、教育、婚姻、吸烟、饮酒、收入）；地区层面（经济发展、医疗资源、人口规模）
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{基准回归结果}
+
+
+    \scriptsize
+    \tiny
+    \centering
+    \begin{threeparttable}
+        \begin{tabular}{lccc}
+            \toprule
+            变量                & 模型5                    & 模型6                     & 模型7                     \\
+            \midrule
+            Treat$\times$Post & $-0.057^{*}\,(0.034)$  & $-0.060^{*}\,(0.034)$   & $-0.067^{**}\,(0.034)$  \\
+            性别                &                        & $0.315\,(0.227)$        & $0.315\,(0.227)$        \\
+            年龄                &                        & $0.008\,(0.009)$        & $0.008\,(0.009)$        \\
+            受教育程度             &                        & $0.093\,(0.065)$        & $0.099\,(0.065)$        \\
+            婚姻状况              &                        & $-0.305^{***}\,(0.065)$ & $-0.304^{***}\,(0.065)$ \\
+            是否吸烟              &                        & $-0.480^{***}\,(0.068)$ & $-0.479^{***}\,(0.068)$ \\
+            是否饮酒              &                        & $-0.095^{***}\,(0.032)$ & $-0.095^{***}\,(0.032)$ \\
+            是否有工资性收入          &                        & $-0.113^{***}\,(0.024)$ & $-0.111^{***}\,(0.024)$ \\
+            经济发展水平            &                        &                         & $-0.223^{***}\,(0.072)$ \\
+            地区人口规模            &                        &                         & $0.157\,(0.204)$        \\
+            医疗资源规模            &                        &                         & $-0.066\,(0.098)$       \\
+            常数项               & $6.907^{***}\,(0.009)$ & $6.641^{***}\,(0.592)$  & $8.697^{***}\,(1.543)$  \\
+            Adjusted-R$^2$    & 0.441                  & 0.444                   & 0.444                   \\
+            \bottomrule
+        \end{tabular}
+        \begin{tablenotes}\tiny
+            \item 注：$^*$、$^{**}$、$^{***}$分别表示在10\%、5\%、1\%水平显著；括号为个体聚类稳健标准误。均控制个体、地区、年份固定效应；reghdfe估计；$N=49{,}269$。
+        \end{tablenotes}
+    \end{threeparttable}
+    \small
+    \begin{itemize}
+        \item 示范区显著降低失能水平：以控制个体与地区因素后的模型7为准，Treat×Post系数$-0.067$，约为样本均值的$0.97\%$降幅。
+        \item 个体层面：在婚，有工资性收入者显著降低失能；吸烟、饮酒者失能更低（生存者自选择效应：只有“幸存”下来的个体才能继续被观察到）。
+        \item 地区层面：经济发展水平越高失能越低；人口规模与医疗资源规模不显著。
+    \end{itemize}
+\end{frame}
+
+% =====================
+% 七、异质性分析
+% =====================
+
+\begin{frame}{异质性分析: 医疗资源规模与服务质量}
+    对样本总体$\{{Disability},Treat×Post,X\}$通过资源异质性或质量异质性划分子样本，分别估计DID模型，结果如下：
+    {
+    \scriptsize
+    \small
+    \begin{center}
+        \begin{threeparttable}
+            \begin{tabular}{lcccc}
+                \toprule
+                变量                & 医资丰富区             & 医资匮乏区                 & 服务质量较高区           & 服务质量较低区               \\
+                \midrule
+                Treat$\times$Post & $-0.046\,(0.054)$ & $-0.118^{*}\,(0.051)$ & $-0.154\,(0.147)$ & $-0.061^{*}\,(0.036)$ \\
+                Adjusted-R$^2$    & 0.454             & 0.450                 & 0.428             & 0.446                 \\
+                观测记录总数            & 24{,}682          & 24{,}587              & 3{,}802           & 45{,}467              \\
+                \bottomrule
+            \end{tabular}
+        \end{threeparttable}
+    \end{center}
+    }
+    \normalsize
+    \begin{itemize}
+        \item 资源异质性：匮乏区显著抑制失能；丰富区不显著。
+        \item 质量异质性：低质量区显著；高质量区（省会）不显著。
+        \item 说明：政策在"补短板"场景更有效。
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{影响机制分析}
+    样本变为$\{Z,Treat×Post,X\}$，即因变量更改为机制变量$Z$（示性变量），探究三个机制：接受体检服务、慢性病知晓情况、慢性病管理
+    {
+    \scriptsize
+    \begin{center} % 将表格居中限定在这个环境内
+        \begin{threeparttable}
+            \begin{tabular}{lccccc}
+                \toprule
+                变量                & 接受体检服务        & 慢性病知晓        & 单病知晓     & 共病知晓          & 慢病管理          \\
+                \midrule
+                Treat$\times$Post & $0.035^{***}$ & $0.023^{**}$ & $0.075$  & $0.273^{***}$ & $0.060^{***}$ \\
+                Adjusted-R$^2$    & 0.200         & 0.443        & 0.049    & 0.049         & 0.558         \\
+                观测记录总数            & 48{,}676      & 49{,}269     & 49{,}269 & 49{,}269      & 38{,}185      \\
+                \bottomrule
+            \end{tabular}
+        \end{threeparttable}
+    \end{center} % 结束表格居中环境
+    }
+    \normalsize
+    \begin{itemize}
+        \item 系数都为正数，说明开展慢性病综合防控工作能够在提升慢性病知晓率的同时促使个体加强慢性病自我管理,控制和延缓病情发展;根据前文分析,这些行为有助于降低失能风险
+    \end{itemize}
+\end{frame}
+
+% =====================
+% 九、表4–表6
+% =====================
+
+
+
+
+
+% =====================
+% 十、对策建议
+% =====================
+\section{总结与讨论}
+
+\begin{frame}{失能预防建议}
+    \begin{enumerate}
+        \item 关口前移：监测老年人慢病风险，制定针对性预防方案。
+        \item 全生命周期视角：学龄人群医教协同、阶段衔接。
+        \item 优质资源下沉：重视区域均衡配置，财政支持向欠发达、农村与基层倾斜。
+    \end{enumerate}
+    \begin{tcolorbox}
+        \begin{itemize}
+            \item 缺少模型检验，模型形式的合理性与稳健性未验证
+            \item 数据包含2018–2020受政策/COVID影响
+            \item 控制变量缺少医学相关变量，例如遗传史，吸烟史等可能对慢性病的发展也有影响
+        \end{itemize}
+    \end{tcolorbox}
+\end{frame}

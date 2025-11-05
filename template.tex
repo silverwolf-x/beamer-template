@@ -1,0 +1,93 @@
+\documentclass[UTF8,c,compress,aspectratio=169,draft]{ctexbeamer}
+% \documentclass[UTF8,c, aspectratio=169, compress]{ctexbeamer}
+
+% ===== 主题与色彩 =====
+\usetheme{Frankfurt}
+\usecolortheme{beaver}
+
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{tcolorbox}
+\usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% ===== 人民大学红色主题定义 =====
+\definecolor{RUCRed}{RGB}{174, 11, 42}
+\setbeamercolor{structure}{fg=RUCRed}
+\setbeamercolor{palette primary}{bg=RUCRed,fg=white}
+\setbeamercolor{block title}{bg=RUCRed,fg=white}
+\setbeamercolor{frametitle}{bg=RUCRed,fg=white}
+\setbeamercolor{title}{bg=RUCRed,fg=white}
+
+% ===== 标题、作者、日期 =====
+\title{title}
+\author{silverwolfx}
+\institute{\small 课程汇报}
+\date{\today}
+
+% ===== 目录在每节开始时显示（可选） =====
+\AtBeginSection[]{
+    \begin{frame}{目录}
+    	\tableofcontents[currentsection]
+    \end{frame}
+}
+
+\begin{document}
+
+% ===== 标题页 =====
+\begin{frame}
+    \titlepage
+\end{frame}
+
+
+% \input{content.tex}
+
+% ===== 常用样式 =====
+
+\begin{frame}{常用样式}
+
+    {
+        \scriptsize
+        \begin{center} % 将表格居中限定在这个环境内
+            \begin{threeparttable}\caption{示例表格}
+                \begin{tabular}{lccccc}
+                    \toprule
+                    变量                & 接受体检服务        & 慢性病知晓        & 单病知晓    & 共病知晓          & 慢病管理          \\
+                    \midrule
+                    Treat$\times$Post & $0.035^{***}$ & $0.023^{**}$ & $0.075$ & $0.273^{***}$ & $0.060^{***}$ \\
+                    \bottomrule
+                \end{tabular}
+            \end{threeparttable}
+        \end{center} % 结束表格居中环境
+    }
+    \normalsize
+
+    \begin{block}{定义公式}
+        \[
+            Y = \beta_0 + \beta_1 \text{Treat} + \beta_2 \text{Post} + \beta_3 (\text{Treat} \times \text{Post}) + \varepsilon
+        \]
+        \begin{itemize}
+            \item $\beta$都为正数\cite{Fu2016}
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+\begin{frame}{常用样式}
+    \begin{tcolorbox}
+
+        一个框
+    \end{tcolorbox}
+    \begin{figure}
+        \includegraphics[width=0.4\textwidth]{test.jpg}
+    \end{figure}
+\end{frame}
+
+
+
+% 若需要参考文献可启用
+% 引用了才有展示
+\begin{frame}{参考文献}
+    \printbibliography[heading=none]
+\end{frame}
+
+\end{document}
